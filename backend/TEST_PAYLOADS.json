@@ -1,0 +1,279 @@
+{
+  "createFormExample": {
+    "endpoint": "POST /api/forms",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-user-id": "507f1f77bcf86cd799439011"
+    },
+    "body": {
+      "airtableBaseId": "appXXXXXXXXXXXXXX",
+      "airtableTableId": "tblXXXXXXXXXXXXXX",
+      "questions": [
+        {
+          "questionKey": "fullName",
+          "fieldId": "fld001",
+          "label": "What is your full name?",
+          "type": "shortText",
+          "required": true
+        },
+        {
+          "questionKey": "email",
+          "fieldId": "fld002",
+          "label": "Email Address",
+          "type": "shortText",
+          "required": true
+        },
+        {
+          "questionKey": "country",
+          "fieldId": "fld003",
+          "label": "Country",
+          "type": "singleSelect",
+          "required": true,
+          "options": ["USA", "Canada", "UK", "Other"]
+        },
+        {
+          "questionKey": "otherCountry",
+          "fieldId": "fld004",
+          "label": "Please specify your country",
+          "type": "shortText",
+          "required": true,
+          "conditionalRules": {
+            "logic": "AND",
+            "conditions": [
+              {
+                "questionKey": "country",
+                "operator": "equals",
+                "value": "Other"
+              }
+            ]
+          }
+        },
+        {
+          "questionKey": "interests",
+          "fieldId": "fld005",
+          "label": "What are your interests?",
+          "type": "multiSelect",
+          "required": false,
+          "options": ["Technology", "Sports", "Music", "Art", "Travel"]
+        },
+        {
+          "questionKey": "bio",
+          "fieldId": "fld006",
+          "label": "Tell us about yourself",
+          "type": "longText",
+          "required": false
+        }
+      ]
+    }
+  },
+
+  "submitFormExample": {
+    "endpoint": "POST /api/forms/:formId/submit",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "answers": {
+        "fullName": "John Doe",
+        "email": "john.doe@example.com",
+        "country": "USA",
+        "interests": ["Technology", "Travel"],
+        "bio": "Software engineer passionate about building great products."
+      }
+    }
+  },
+
+  "submitFormWithConditionalExample": {
+    "endpoint": "POST /api/forms/:formId/submit",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "answers": {
+        "fullName": "Jane Smith",
+        "email": "jane.smith@example.com",
+        "country": "Other",
+        "otherCountry": "Australia",
+        "interests": ["Music", "Art"],
+        "bio": "Creative professional with 10 years experience."
+      }
+    }
+  },
+
+  "complexConditionalLogicExample": {
+    "endpoint": "POST /api/forms",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-user-id": "507f1f77bcf86cd799439011"
+    },
+    "body": {
+      "airtableBaseId": "appXXXXXXXXXXXXXX",
+      "airtableTableId": "tblXXXXXXXXXXXXXX",
+      "questions": [
+        {
+          "questionKey": "employmentStatus",
+          "fieldId": "fld101",
+          "label": "Employment Status",
+          "type": "singleSelect",
+          "required": true,
+          "options": ["Employed", "Self-Employed", "Student", "Unemployed"]
+        },
+        {
+          "questionKey": "companyName",
+          "fieldId": "fld102",
+          "label": "Company Name",
+          "type": "shortText",
+          "required": true,
+          "conditionalRules": {
+            "logic": "OR",
+            "conditions": [
+              {
+                "questionKey": "employmentStatus",
+                "operator": "equals",
+                "value": "Employed"
+              },
+              {
+                "questionKey": "employmentStatus",
+                "operator": "equals",
+                "value": "Self-Employed"
+              }
+            ]
+          }
+        },
+        {
+          "questionKey": "yearsExperience",
+          "fieldId": "fld103",
+          "label": "Years of Experience",
+          "type": "shortText",
+          "required": false,
+          "conditionalRules": {
+            "logic": "AND",
+            "conditions": [
+              {
+                "questionKey": "employmentStatus",
+                "operator": "notEquals",
+                "value": "Student"
+              }
+            ]
+          }
+        },
+        {
+          "questionKey": "university",
+          "fieldId": "fld104",
+          "label": "University Name",
+          "type": "shortText",
+          "required": true,
+          "conditionalRules": {
+            "logic": "AND",
+            "conditions": [
+              {
+                "questionKey": "employmentStatus",
+                "operator": "equals",
+                "value": "Student"
+              }
+            ]
+          }
+        },
+        {
+          "questionKey": "lookingForWork",
+          "fieldId": "fld105",
+          "label": "Are you looking for work?",
+          "type": "singleSelect",
+          "required": false,
+          "options": ["Yes", "No"],
+          "conditionalRules": {
+            "logic": "AND",
+            "conditions": [
+              {
+                "questionKey": "employmentStatus",
+                "operator": "equals",
+                "value": "Unemployed"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+
+  "webhookPayloadExample": {
+    "description": "Example webhook payload from Airtable",
+    "endpoint": "POST /api/webhooks/airtable",
+    "body": {
+      "webhook": {
+        "baseId": "appXXXXXXXXXXXXXX",
+        "webhookId": "achXXXXXXXXXXXXXX",
+        "timestamp": "2025-11-29T10:00:00.000Z",
+        "actionMetadata": {
+          "changedTablesById": {
+            "tblXXXXXXXXXXXXXX": {
+              "changedRecordsById": {
+                "recXXXXXXXXXXXXXX": {
+                  "current": {
+                    "cellValuesByFieldId": {
+                      "fld001": "Updated Name",
+                      "fld002": "updated.email@example.com"
+                    }
+                  },
+                  "previous": {
+                    "cellValuesByFieldId": {
+                      "fld001": "Old Name",
+                      "fld002": "old.email@example.com"
+                    }
+                  }
+                }
+              },
+              "destroyedRecordIds": ["recYYYYYYYYYYYYYY", "recZZZZZZZZZZZZZZ"]
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "multiSelectValidationExample": {
+    "description": "Example showing multi-select validation",
+    "endpoint": "POST /api/forms/:formId/submit",
+    "validSubmission": {
+      "answers": {
+        "interests": ["Technology", "Travel"]
+      }
+    },
+    "invalidSubmission": {
+      "answers": {
+        "interests": ["Technology", "InvalidOption"]
+      }
+    },
+    "expectedError": {
+      "error": "Validation failed",
+      "details": [
+        "Invalid options for \"What are your interests?\": InvalidOption"
+      ]
+    }
+  },
+
+  "attachmentExample": {
+    "description": "Example showing attachment field format",
+    "endpoint": "POST /api/forms/:formId/submit",
+    "body": {
+      "answers": {
+        "resume": [
+          {
+            "url": "https://example.com/resume.pdf",
+            "filename": "resume.pdf"
+          }
+        ],
+        "portfolio": [
+          {
+            "url": "https://example.com/project1.jpg",
+            "filename": "project1.jpg"
+          },
+          {
+            "url": "https://example.com/project2.jpg",
+            "filename": "project2.jpg"
+          }
+        ]
+      }
+    }
+  }
+}
