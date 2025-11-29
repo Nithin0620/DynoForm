@@ -3,10 +3,7 @@ import { User } from '../models';
 import { AirtableService } from '../services/airtableService';
 import { isSupportedFieldType, mapAirtableTypeToQuestionType } from '../utils/fieldTypeValidation';
 
-/**
- * GET /airtable/bases
- * List all bases accessible to the authenticated user
- */
+
 export const listBases = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
@@ -23,10 +20,7 @@ export const listBases = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * GET /airtable/base/:baseId/tables
- * List all tables in a specific base
- */
+
 export const listTables = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
@@ -44,10 +38,7 @@ export const listTables = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * GET /airtable/table/:baseId/:tableId/fields
- * Get fields for a specific table, filtering to only supported types
- */
+
 export const getTableFields = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
@@ -58,12 +49,10 @@ export const getTableFields = async (req: Request, res: Response) => {
     const airtableService = new AirtableService(req.user.accessToken);
     const fields = await airtableService.getTableFields(baseId, tableId);
 
-    // Filter to only supported field types
     const supportedFields = fields.filter((field: any) => {
       return isSupportedFieldType(field.type);
     });
 
-    // Map to our internal format
     const mappedFields = supportedFields.map((field: any) => ({
       id: field.id,
       name: field.name,
@@ -72,7 +61,6 @@ export const getTableFields = async (req: Request, res: Response) => {
       options: field.options?.choices?.map((c: any) => c.name) || undefined
     }));
 
-    // Also return rejected fields for transparency
     const unsupportedFields = fields.filter((field: any) => {
       return !isSupportedFieldType(field.type);
     }).map((field: any) => ({

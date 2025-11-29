@@ -1,46 +1,46 @@
 import { Request, Response, NextFunction } from 'express';
+
+import jwt from 'jsonwebtoken';
 import { User, IUser } from '../models';
 
-// Extend Express Request to include user
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
 declare global {
-  namespace Express {
-    interface Request {
-      user?: IUser;
+    namespace Express {
+        interface Request {
+            user?: IUser;
+        }
     }
-  }
 }
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Extract user ID from Authorization header (Bearer token would contain user ID or token)
-    // For this implementation, we expect userId in header for simplicity
-    // In production, use JWT or session-based auth
-    const userId = req.headers['x-user-id'] as string;
+    try {
+        const authHeader = req.headers.authorization;
 
-    if (!userId) {
-      return res.status(401).json({ error: 'Authentication required' });
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'Authentication required. Please provide Bearer token.' });
+        }
+
+        const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+            
+            const user = await User.findById(decoded.userId);
+            if (!user) {
+                return res.status(401).json({ error: 'Invalid token - user not found' });
+            }
+
+            req.user = user;
+            next();
+        } catch (jwtError) {
+            return res.status(401).json({ error: 'Invalid or expired token' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Authentication error' });
     }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid user credentials' });
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(500).json({ error: 'Authentication error' });
-  }
 };
 
-export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-
-  next();
+export const generateToken = (userId: string): string => {
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
 };

@@ -1,16 +1,9 @@
 import { IConditionalRules } from '../models';
 
-/**
- * Pure function to determine if a question should be shown based on conditional rules
- * @param rules - The conditional rules for the question (null means always show)
- * @param answersSoFar - The answers provided so far in the form
- * @returns boolean - true if the question should be shown, false otherwise
- */
 export function shouldShowQuestion(
   rules: IConditionalRules | null | undefined,
   answersSoFar: Record<string, any>
 ): boolean {
-  // If no rules, always show the question
   if (!rules || !rules.conditions || rules.conditions.length === 0) {
     return true;
   }

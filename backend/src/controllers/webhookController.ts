@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import { FormResponse } from '../models';
 
-/**
- * POST /webhooks/airtable
- * Webhook receiver for Airtable changes
- * Handles record.updated and record.deleted events
- */
 export const handleAirtableWebhook = async (req: Request, res: Response) => {
   try {
     const { webhook } = req.body;
@@ -17,13 +12,6 @@ export const handleAirtableWebhook = async (req: Request, res: Response) => {
       });
     }
 
-    // Airtable webhook structure varies, but typically includes:
-    // - baseId
-    // - tableId
-    // - webhookId
-    // - timestamp
-    // - actionMetadata with changedTablesById
-
     const { baseId, actionMetadata } = webhook;
 
     if (!actionMetadata || !actionMetadata.changedTablesById) {
@@ -31,7 +19,6 @@ export const handleAirtableWebhook = async (req: Request, res: Response) => {
       return res.status(200).json({ success: true, message: 'No changes to process' });
     }
 
-    // Process each changed table
     for (const [tableId, changes] of Object.entries(actionMetadata.changedTablesById)) {
       const tableChanges = changes as any;
 
@@ -121,10 +108,7 @@ export const handleAirtableWebhook = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * GET /webhooks/airtable/test
- * Test endpoint to verify webhook is accessible
- */
+
 export const testWebhook = (req: Request, res: Response) => {
   res.json({
     success: true,

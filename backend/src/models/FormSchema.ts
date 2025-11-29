@@ -17,7 +17,7 @@ export interface IQuestion {
   label: string;
   type: QuestionType;
   required: boolean;
-  options?: string[]; // For select types
+  options?: string[]; 
   conditionalRules?: IConditionalRules | null;
 }
 

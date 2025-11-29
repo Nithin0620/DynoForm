@@ -40,7 +40,6 @@ const FormResponseSchema = new Schema<IFormResponse>({
   timestamps: true
 });
 
-// Compound index for efficient queries
 FormResponseSchema.index({ formId: 1, deletedInAirtable: 1 });
 
 export const FormResponse = mongoose.model<IFormResponse>('FormResponse', FormResponseSchema);
